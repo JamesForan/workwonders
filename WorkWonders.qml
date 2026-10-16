@@ -47,16 +47,22 @@ BarWidget {
   readonly property real cellSize: Style.font.body + 2
   readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
 
+  // Workspace and monitor names go into a Lua dispatch, so quote them as Lua
+  // strings: a name with a quote or backslash can't break out of it.
+  function luaString(value) {
+    return "\"" + String(value).replace(/\\/g, "\\\\").replace(/"/g, "\\\"").replace(/\n/g, "\\n") + "\""
+  }
+
   function focusWorkspace(id) {
     if (!root.bar) return
-    root.bar.run("hyprctl dispatch " + Util.shellQuote("hl.dsp.focus({ workspace = \"" + id + "\" })"))
+    root.bar.run("hyprctl dispatch " + Util.shellQuote("hl.dsp.focus({ workspace = " + luaString(id) + " })"))
   }
 
   function toggleSpecial(name, monitor) {
     if (!root.bar) return
     // toggle_special acts on the focused monitor, so focus this group's first.
-    root.bar.run("hyprctl dispatch " + Util.shellQuote("hl.dsp.focus({ monitor = \"" + monitor + "\" })")
-      + " && hyprctl dispatch " + Util.shellQuote("hl.dsp.workspace.toggle_special(\"" + name + "\")"))
+    root.bar.run("hyprctl dispatch " + Util.shellQuote("hl.dsp.focus({ monitor = " + luaString(monitor) + " })")
+      + " && hyprctl dispatch " + Util.shellQuote("hl.dsp.workspace.toggle_special(" + luaString(name) + ")"))
   }
 
   // Special workspaces that just opened, so only that moment animates and a
