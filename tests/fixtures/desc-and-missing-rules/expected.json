@@ -6,7 +6,9 @@
       {
         "id": 1,
         "label": "1",
+        "special": false,
         "shown": true,
+        "under": false,
         "occupied": true
       }
     ]
@@ -18,13 +20,17 @@
       {
         "id": 5,
         "label": "5",
+        "special": false,
         "shown": false,
+        "under": false,
         "occupied": false
       },
       {
         "id": 6,
         "label": "6",
+        "special": false,
         "shown": true,
+        "under": false,
         "occupied": true
       }
     ]

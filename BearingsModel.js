@@ -7,7 +7,15 @@
 // bar), each listing the workspaces that belong to it:
 //
 //   [{ monitor: "DP-1", focused: false,
-//      workspaces: [{ id: 2, label: "2", shown: true, occupied: true }, ...] }]
+//      workspaces: [{ id: 2, label: "2", special: false, shown: true,
+//                     under: false, occupied: true }, ...] }]
+//
+// Special workspaces (scratchpad, drop-down terminal...) follow
+// options.specials: "open" (default) lists one only while it is open, on the
+// monitor showing it; "always" also lists it on the monitor it last lived on;
+// "hide" never lists them. While one is open it is the shown cell and the
+// regular workspace underneath is marked "under". options.specialLabels maps a
+// name ("scratchpad") to its label; the default is its first letter.
 //
 // A workspace belongs to the monitor it is on right now. One that doesn't
 // exist yet belongs to the monitor its workspace rule names, so empty slots
@@ -110,26 +118,65 @@ function layout(data, options) {
     if (!home[id]) home[id] = focused.name
   }
 
+  var specialsMode = opts.specials || "open"
+  var specialLabels = opts.specialLabels || {}
+  var specials = workspaces.filter(function(ws) {
+    return ws && ws.id < 0 && String(ws.name || "").indexOf("special:") === 0
+  })
+
   return monitors.map(function(m) {
     var active = m.activeWorkspace ? m.activeWorkspace.id : 0
+    var openSpecial = specialsMode !== "hide" && m.specialWorkspace && m.specialWorkspace.name ? String(m.specialWorkspace.name) : ""
     var ids = Object.keys(home)
       .map(Number)
       .filter(function(id) { return home[id] === m.name })
       .sort(function(a, b) { return a - b })
+    var cells = ids.map(function(id) {
+      var ws = byId[id]
+      var name = ws && ws.name !== undefined ? String(ws.name) : String(id)
+      return {
+        id: id,
+        label: name !== "" ? name : String(id),
+        special: false,
+        // A special workspace drawn over this monitor takes the fill; the
+        // workspace underneath keeps an outline ("under").
+        shown: id === active && !openSpecial,
+        under: id === active && !!openSpecial,
+        occupied: !!ws && (ws.windows || 0) > 0
+      }
+    })
+
+    if (specialsMode !== "hide") {
+      specials.forEach(function(ws) {
+        var full = String(ws.name)
+        var isOpenHere = full === openSpecial
+        var belongsHere = specialsMode === "always" && ws.monitor === m.name && !openElsewhere(full, m.name, monitors)
+        if (!isOpenHere && !belongsHere) return
+        var short = full.slice("special:".length)
+        cells.push({
+          id: ws.id,
+          name: short,
+          label: specialLabels[short] !== undefined ? String(specialLabels[short]) : short.charAt(0).toUpperCase(),
+          special: true,
+          shown: isOpenHere,
+          under: false,
+          occupied: (ws.windows || 0) > 0
+        })
+      })
+    }
+
     return {
       monitor: m.name,
       focused: m.name === focused.name,
-      workspaces: ids.map(function(id) {
-        var ws = byId[id]
-        var name = ws && ws.name !== undefined ? String(ws.name) : String(id)
-        return {
-          id: id,
-          label: name !== "" ? name : String(id),
-          shown: id === active,
-          occupied: !!ws && (ws.windows || 0) > 0
-        }
-      })
+      workspaces: cells
     }
+  })
+}
+
+// A special workspace that is open on one monitor is listed there only.
+function openElsewhere(name, here, monitors) {
+  return monitors.some(function(m) {
+    return m.name !== here && m.specialWorkspace && m.specialWorkspace.name === name
   })
 }
 
@@ -143,6 +190,7 @@ function forScreen(groups, screens, ownMonitor) {
 if (typeof module !== "undefined") {
   module.exports = {
     forScreen: forScreen,
+    openElsewhere: openElsewhere,
     layout: layout,
     numericId: numericId,
     resolveMonitor: resolveMonitor

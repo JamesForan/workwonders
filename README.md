@@ -14,6 +14,7 @@ Made for multi-monitor setups, where Omarchy's own workspace widget shows one ro
 - Empty workspaces are dimmed. Click any number to go there.
 - Follows your workspace rules: a workspace you've assigned to a monitor sits in that monitor's group even before it exists, so empty slots stay clickable where they will open.
 - A workspace you've moved to another screen shows under the screen it's on now.
+- Special workspaces (scratchpad, a drop-down terminal) slide into the screen they open on, as a letter, drawn filled because they have focus. The workspace underneath keeps an outline. Click the letter to close it.
 - With one monitor it looks like Omarchy's own widget: numbers 1 to 5 plus any other workspace in use, without the group border.
 - Updates live as you switch, move workspaces, or plug monitors in and out.
 
@@ -43,11 +44,23 @@ Add these to the widget's entry in `bar.layout`:
 | --- | --- | --- |
 | `screens` | `"all"` | `"all"` shows every monitor in each bar. `"own"` shows only the monitor that bar is on, for setups with a bar on every screen. |
 | `alwaysShow` | `5` without workspace rules, `0` with them | Numbered workspaces to show even when they don't exist yet. |
+| `specials` | `"open"` | Special workspaces: `"open"` shows one only while it's open, on that screen; `"always"` keeps them listed on the screen they last opened on; `"hide"` never shows them. |
+| `specialLabels` | first letter of the name | Letter (or icon) for each special workspace, by name. |
 
 For example, on a bar drawn on every screen:
 
 ```json
 { "id": "jamesforan.bearings", "screens": "own" }
+```
+
+Or, with a scratchpad and a quake-style drop-down terminal that live in special workspaces named `scratchpad` and `terminal`:
+
+```json
+{
+  "id": "jamesforan.bearings",
+  "specials": "always",
+  "specialLabels": { "scratchpad": "S", "terminal": "Q" }
+}
 ```
 
 ## Assigning workspaces to monitors
@@ -64,7 +77,6 @@ hl.workspace_rule({ workspace = "2", monitor = "desc:Samsung Electric Company SE
 ## Notes
 
 - Omarchy draws the bar on every screen. With the default `"screens": "all"`, every bar shows every monitor. Use `"own"` if you'd rather each bar show only its own screen.
-- Special workspaces (the scratchpad and the like) aren't shown.
 - This plugin runs inside the Omarchy Shell process. Review the source before installing any plugin.
 
 ## Remove
