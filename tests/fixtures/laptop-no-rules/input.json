@@ -1,0 +1,46 @@
+{
+ "monitors": [
+  {
+   "name": "eDP-1",
+   "description": "BOE 0x0BCA",
+   "x": 0,
+   "y": 0,
+   "focused": true,
+   "disabled": false,
+   "activeWorkspace": {
+    "id": 3,
+    "name": "3"
+   },
+   "width": 2256,
+   "height": 1504,
+   "scale": 1.6
+  }
+ ],
+ "workspaces": [
+  {
+   "id": 1,
+   "name": "1",
+   "monitor": "eDP-1",
+   "windows": 2
+  },
+  {
+   "id": 3,
+   "name": "3",
+   "monitor": "eDP-1",
+   "windows": 1
+  },
+  {
+   "id": 7,
+   "name": "7",
+   "monitor": "eDP-1",
+   "windows": 1
+  },
+  {
+   "id": -98,
+   "name": "special:scratchpad",
+   "monitor": "eDP-1",
+   "windows": 1
+  }
+ ],
+ "rules": []
+}

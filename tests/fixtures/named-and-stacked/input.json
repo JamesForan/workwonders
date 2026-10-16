@@ -1,0 +1,49 @@
+{
+ "monitors": [
+  {
+   "name": "eDP-1",
+   "description": "BOE 0x0BCA",
+   "x": 0,
+   "y": 0,
+   "focused": true,
+   "disabled": false,
+   "activeWorkspace": {
+    "id": 11,
+    "name": "code"
+   },
+   "width": 2256,
+   "height": 1504,
+   "scale": 1.6
+  },
+  {
+   "name": "DP-1",
+   "description": "Samsung",
+   "x": 0,
+   "y": -900,
+   "focused": false,
+   "disabled": false,
+   "activeWorkspace": {
+    "id": 2,
+    "name": "2"
+   },
+   "width": 3440,
+   "height": 1440,
+   "scale": 1.6
+  }
+ ],
+ "workspaces": [
+  {
+   "id": 11,
+   "name": "code",
+   "monitor": "eDP-1",
+   "windows": 2
+  },
+  {
+   "id": 2,
+   "name": "2",
+   "monitor": "DP-1",
+   "windows": 0
+  }
+ ],
+ "rules": []
+}

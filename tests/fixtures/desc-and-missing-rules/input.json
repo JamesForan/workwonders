@@ -1,0 +1,85 @@
+{
+ "monitors": [
+  {
+   "name": "eDP-1",
+   "description": "BOE 0x0BCA",
+   "x": 0,
+   "y": 0,
+   "focused": true,
+   "disabled": false,
+   "activeWorkspace": {
+    "id": 1,
+    "name": "1"
+   },
+   "width": 2256,
+   "height": 1504,
+   "scale": 1.6
+  },
+  {
+   "name": "HDMI-A-1",
+   "description": "Dell Inc. DELL U4025QW ABC123",
+   "x": 1410,
+   "y": 0,
+   "focused": false,
+   "disabled": false,
+   "activeWorkspace": {
+    "id": 6,
+    "name": "6"
+   },
+   "width": 5120,
+   "height": 2160,
+   "scale": 1.25
+  },
+  {
+   "name": "DP-3",
+   "description": "LG Electronics 27GL850",
+   "x": 3000,
+   "y": 0,
+   "focused": false,
+   "disabled": true,
+   "activeWorkspace": {
+    "id": 0,
+    "name": ""
+   },
+   "width": 2560,
+   "height": 1440,
+   "scale": 1
+  }
+ ],
+ "workspaces": [
+  {
+   "id": 1,
+   "name": "1",
+   "monitor": "eDP-1",
+   "windows": 1
+  },
+  {
+   "id": 6,
+   "name": "6",
+   "monitor": "HDMI-A-1",
+   "windows": 2
+  }
+ ],
+ "rules": [
+  {
+   "workspaceString": "1",
+   "monitor": "eDP-1"
+  },
+  {
+   "workspaceString": "5",
+   "monitor": "desc:Dell Inc. DELL U4025QW"
+  },
+  {
+   "workspaceString": "6",
+   "monitor": "desc:Dell Inc. DELL U4025QW"
+  },
+  {
+   "workspaceString": "8",
+   "monitor": "DP-9"
+  },
+  {
+   "workspaceString": "name:code",
+   "monitor": "eDP-1"
+  }
+ ]
+}

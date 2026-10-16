@@ -1,0 +1,38 @@
+[
+  {
+    "monitor": "DP-1",
+    "focused": false,
+    "workspaces": [
+      {
+        "id": 3,
+        "label": "3",
+        "shown": true,
+        "occupied": true
+      },
+      {
+        "id": 4,
+        "label": "4",
+        "shown": false,
+        "occupied": false
+      }
+    ]
+  },
+  {
+    "monitor": "eDP-1",
+    "focused": true,
+    "workspaces": [
+      {
+        "id": 1,
+        "label": "1",
+        "shown": true,
+        "occupied": true
+      },
+      {
+        "id": 2,
+        "label": "2",
+        "shown": false,
+        "occupied": true
+      }
+    ]
+  }
+]

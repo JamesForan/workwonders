@@ -1,0 +1,32 @@
+[
+  {
+    "monitor": "eDP-1",
+    "focused": true,
+    "workspaces": [
+      {
+        "id": 1,
+        "label": "1",
+        "shown": true,
+        "occupied": true
+      }
+    ]
+  },
+  {
+    "monitor": "HDMI-A-1",
+    "focused": false,
+    "workspaces": [
+      {
+        "id": 5,
+        "label": "5",
+        "shown": false,
+        "occupied": false
+      },
+      {
+        "id": 6,
+        "label": "6",
+        "shown": true,
+        "occupied": true
+      }
+    ]
+  }
+]
