@@ -1,27 +1,5 @@
 [
   {
-    "monitor": "DP-1",
-    "focused": false,
-    "workspaces": [
-      {
-        "id": 2,
-        "label": "2",
-        "special": false,
-        "shown": true,
-        "under": false,
-        "occupied": true
-      },
-      {
-        "id": 4,
-        "label": "4",
-        "special": false,
-        "shown": false,
-        "under": false,
-        "occupied": false
-      }
-    ]
-  },
-  {
     "monitor": "eDP-1",
     "focused": true,
     "workspaces": [
@@ -49,6 +27,28 @@
         "shown": true,
         "under": false,
         "occupied": true
+      }
+    ]
+  },
+  {
+    "monitor": "DP-1",
+    "focused": false,
+    "workspaces": [
+      {
+        "id": 2,
+        "label": "2",
+        "special": false,
+        "shown": true,
+        "under": false,
+        "occupied": true
+      },
+      {
+        "id": 4,
+        "label": "4",
+        "special": false,
+        "shown": false,
+        "under": false,
+        "occupied": false
       }
     ]
   }

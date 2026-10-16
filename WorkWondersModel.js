@@ -3,8 +3,8 @@
 //
 // Input is what hyprctl prints: { monitors, workspaces, rules } from
 // `hyprctl -j monitors`, `hyprctl -j workspaces` and `hyprctl -j workspacerules`.
-// Output is one group per monitor, left to right (top to bottom for a vertical
-// bar), each listing the workspaces that belong to it:
+// Output is one group per monitor, in the order sortedMonitors() explains,
+// each listing the workspaces that belong to it:
 //
 //   [{ monitor: "DP-1", focused: false,
 //      workspaces: [{ id: 2, label: "2", special: false, shown: true,
@@ -35,35 +35,52 @@ function logicalSize(m) {
   return (m.transform || 0) % 2 === 1 ? { w: h, h: w } : { w: w, h: h }
 }
 
-// Reading order. For a horizontal bar, monitors whose vertical extents overlap
-// form a row; rows go top to bottom and each row left to right. So a laptop
-// under a monitor comes after it, and a laptop beside a taller monitor stays in
-// its row. A vertical bar does the same with columns.
-function sortedMonitors(monitors, vertical) {
+function isInternal(m) {
+  return /^(eDP|LVDS|DSI)-/.test(String(m.name || ""))
+}
+
+// Default order. Screens side by side (one row, judged by vertical overlap)
+// go left to right, as they sit. Stacked screens (more than one row) put the
+// built-in panel first, then the rest in reading order: rows top to bottom,
+// each row left to right. options.order overrides: "layout" is plain reading
+// order; a list of output names or "desc:" prefixes goes first, in that order,
+// and any screen not listed follows in the default order.
+function sortedMonitors(monitors, order) {
   var list = (monitors || []).filter(function(m) { return m && !m.disabled })
-  var across = vertical ? "y" : "x"
-  var down = vertical ? "x" : "y"
-  var extent = function(m) { return vertical ? logicalSize(m).w : logicalSize(m).h }
+  list.sort(function(a, b) { return ((a.y || 0) - (b.y || 0)) || ((a.x || 0) - (b.x || 0)) })
 
-  list.sort(function(a, b) { return ((a[down] || 0) - (b[down] || 0)) || ((a[across] || 0) - (b[across] || 0)) })
-
-  var bands = []
+  var rows = []
   list.forEach(function(m) {
-    var start = m[down] || 0
-    var band = bands[bands.length - 1]
-    if (band && start < band.end) {
-      band.items.push(m)
-      band.end = Math.max(band.end, start + extent(m))
+    var top = m.y || 0
+    var row = rows[rows.length - 1]
+    if (row && top < row.end) {
+      row.items.push(m)
+      row.end = Math.max(row.end, top + logicalSize(m).h)
     } else {
-      bands.push({ end: start + extent(m), items: [m] })
+      rows.push({ end: top + logicalSize(m).h, items: [m] })
     }
   })
 
-  var ordered = []
-  bands.forEach(function(band) {
-    band.items.sort(function(a, b) { return (a[across] || 0) - (b[across] || 0) })
-    ordered = ordered.concat(band.items)
+  var reading = []
+  rows.forEach(function(row) {
+    row.items.sort(function(a, b) { return (a.x || 0) - (b.x || 0) })
+    reading = reading.concat(row.items)
   })
+
+  var ordered = reading
+  if (order !== "layout" && rows.length > 1) {
+    ordered = reading.filter(isInternal).concat(reading.filter(function(m) { return !isInternal(m) }))
+  }
+
+  if (Array.isArray(order) && order.length) {
+    var first = []
+    order.forEach(function(spec) {
+      var name = resolveMonitor(spec, ordered)
+      var m = ordered.filter(function(x) { return x.name === name })[0]
+      if (m && first.indexOf(m) === -1) first.push(m)
+    })
+    ordered = first.concat(ordered.filter(function(m) { return first.indexOf(m) === -1 }))
+  }
   return ordered
 }
 
@@ -87,7 +104,7 @@ function resolveMonitor(spec, monitors) {
 
 function layout(data, options) {
   var opts = options || {}
-  var monitors = sortedMonitors(data && data.monitors, !!opts.vertical)
+  var monitors = sortedMonitors(data && data.monitors, opts.order)
   var workspaces = (data && data.workspaces) || []
   var rules = (data && data.rules) || []
   if (monitors.length === 0) return []
@@ -192,7 +209,9 @@ if (typeof module !== "undefined") {
     forScreen: forScreen,
     openElsewhere: openElsewhere,
     layout: layout,
+    isInternal: isInternal,
     numericId: numericId,
+    sortedMonitors: sortedMonitors,
     resolveMonitor: resolveMonitor
   }
 }

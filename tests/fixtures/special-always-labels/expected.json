@@ -1,36 +1,5 @@
 [
   {
-    "monitor": "DP-1",
-    "focused": false,
-    "workspaces": [
-      {
-        "id": 2,
-        "label": "2",
-        "special": false,
-        "shown": false,
-        "under": true,
-        "occupied": true
-      },
-      {
-        "id": 4,
-        "label": "4",
-        "special": false,
-        "shown": false,
-        "under": false,
-        "occupied": false
-      },
-      {
-        "id": -97,
-        "name": "terminal",
-        "label": "Q",
-        "special": true,
-        "shown": true,
-        "under": false,
-        "occupied": true
-      }
-    ]
-  },
-  {
     "monitor": "eDP-1",
     "focused": true,
     "workspaces": [
@@ -56,6 +25,37 @@
         "label": "S",
         "special": true,
         "shown": false,
+        "under": false,
+        "occupied": true
+      }
+    ]
+  },
+  {
+    "monitor": "DP-1",
+    "focused": false,
+    "workspaces": [
+      {
+        "id": 2,
+        "label": "2",
+        "special": false,
+        "shown": false,
+        "under": true,
+        "occupied": true
+      },
+      {
+        "id": 4,
+        "label": "4",
+        "special": false,
+        "shown": false,
+        "under": false,
+        "occupied": false
+      },
+      {
+        "id": -97,
+        "name": "terminal",
+        "label": "Q",
+        "special": true,
+        "shown": true,
         "under": false,
         "occupied": true
       }

@@ -10,7 +10,7 @@ Made for multi-monitor setups, where Omarchy's own workspace widget shows one ro
 
 ## Features
 
-- One group per monitor, in the order the screens are laid out: rows top to bottom, each row left to right.
+- One group per monitor. Screens side by side read left to right, as they sit; stacked screens put the laptop first. You can set your own order.
 - The workspace each screen is showing is drawn inverted, so with two screens you see both at a glance.
 - The focused screen's group is outlined in your theme's accent colour.
 - Empty workspaces are dimmed. Click any number to go there.
@@ -45,6 +45,7 @@ Add these to the widget's entry in `bar.layout`:
 | Setting | Default | What it does |
 | --- | --- | --- |
 | `screens` | `"all"` | `"all"` shows every monitor in each bar. `"own"` shows only the monitor that bar is on, for setups with a bar on every screen. |
+| `order` | `"auto"` | `"auto"`: side-by-side screens left to right, stacked screens laptop first. `"layout"`: rows top to bottom, each left to right, no laptop rule. Or a list of output names or `desc:` prefixes to put first, e.g. `["eDP-1", "desc:Dell"]`; screens not listed follow in the default order. |
 | `alwaysShow` | `5` without workspace rules, `0` with them | Numbered workspaces to show even when they don't exist yet. |
 | `specials` | `"open"` | Special workspaces: `"open"` shows one only while it's open, on that screen; `"always"` keeps them listed on the screen they last opened on; `"hide"` never shows them. |
 | `specialLabels` | first letter of the name | Letter (or icon) for each special workspace, by name. |

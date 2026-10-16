@@ -1,0 +1,84 @@
+{
+ "monitors": [
+  {
+   "name": "eDP-1",
+   "description": "BOE 0x0BCA",
+   "x": 0,
+   "y": 0,
+   "width": 2256,
+   "height": 1504,
+   "scale": 1.6,
+   "focused": true,
+   "disabled": false,
+   "activeWorkspace": {
+    "id": 1,
+    "name": "1"
+   }
+  },
+  {
+   "name": "DP-1",
+   "description": "Samsung Electric Company SE790C",
+   "x": -370,
+   "y": -900,
+   "width": 3440,
+   "height": 1440,
+   "scale": 1.6,
+   "focused": false,
+   "disabled": false,
+   "activeWorkspace": {
+    "id": 2,
+    "name": "2"
+   }
+  }
+ ],
+ "workspaces": [
+  {
+   "id": -98,
+   "name": "special:scratchpad",
+   "monitor": "eDP-1",
+   "windows": 2
+  },
+  {
+   "id": -97,
+   "name": "special:terminal",
+   "monitor": "eDP-1",
+   "windows": 3
+  },
+  {
+   "id": 2,
+   "name": "2",
+   "monitor": "DP-1",
+   "windows": 2
+  },
+  {
+   "id": 3,
+   "name": "3",
+   "monitor": "eDP-1",
+   "windows": 1
+  },
+  {
+   "id": 1,
+   "name": "1",
+   "monitor": "eDP-1",
+   "windows": 1
+  }
+ ],
+ "rules": [
+  {
+   "workspaceString": "1",
+   "monitor": "eDP-1"
+  },
+  {
+   "workspaceString": "3",
+   "monitor": "eDP-1"
+  },
+  {
+   "workspaceString": "2",
+   "monitor": "DP-1"
+  },
+  {
+   "workspaceString": "4",
+   "monitor": "DP-1"
+  }
+ ]
+}

@@ -9,7 +9,7 @@ import "WorkWondersModel.js" as WorkWondersModel
 
 // Work Wonders: which workspace every screen is showing, from one bar.
 //
-// One group per monitor, ordered as the monitors are laid out. With more than
+// One group per monitor (see "order" below). With more than
 // one monitor each group gets a square border, and the focused monitor's border takes
 // the theme accent. The workspace each monitor is showing is drawn inverted.
 // Empty workspaces are dimmed. Click a number to go there.
@@ -22,6 +22,10 @@ import "WorkWondersModel.js" as WorkWondersModel
 //   "specials": special workspaces (scratchpad, drop-down terminal...):
 //              "open" (default) slides one in while it is open, on the screen
 //              showing it; "always" keeps it listed; "hide" never shows them.
+//   "order":   "auto" (default): side-by-side screens left to right; stacked
+//              screens laptop first, then reading order. "layout": reading
+//              order only. Or a list of output names / "desc:" prefixes to put
+//              first, e.g. ["eDP-1", "desc:Dell"]; unlisted screens follow.
 //   "specialLabels": letters for special workspaces, e.g.
 //              {"scratchpad": "S", "terminal": "Q"}. Default: first letter.
 BarWidget {
@@ -87,6 +91,7 @@ BarWidget {
         const groups = WorkWondersModel.layout(data, {
           vertical: root.vertical,
           alwaysShow: root.setting("alwaysShow", null),
+          order: root.setting("order", "auto"),
           specials: root.setting("specials", "open"),
           specialLabels: root.setting("specialLabels", {})
         })
@@ -136,6 +141,8 @@ BarWidget {
   }
 
   Component.onCompleted: root.refresh()
+  // Settings changed in shell.json: lay out again now, not at the next event.
+  onSettingsChanged: root.refresh()
   onVerticalChanged: root.refresh()
 
   implicitWidth: groupGrid.implicitWidth + trailingGap
