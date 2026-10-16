@@ -10,7 +10,7 @@ import "BearingsModel.js" as BearingsModel
 // Bearings: which workspace every screen is showing, from one bar.
 //
 // One group per monitor, ordered as the monitors are laid out. With more than
-// one monitor each group gets a border, and the focused monitor's border takes
+// one monitor each group gets a square border, and the focused monitor's border takes
 // the theme accent. The workspace each monitor is showing is drawn inverted.
 // Empty workspaces are dimmed. Click a number to go there.
 //
@@ -33,8 +33,9 @@ BarWidget {
   readonly property color fg: root.bar ? root.bar.barForeground : Color.foreground
   readonly property color inverseText: Color.background
   readonly property string fontFamily: root.bar ? root.bar.fontFamily : Style.font.family
-  readonly property real cellWidth: root.vertical ? root.barSize - Style.spaceReal(3) : Style.spaceReal(16)
-  readonly property real cellHeight: root.vertical ? Style.spaceReal(16) : root.barSize - Style.spaceReal(3)
+  // Square cells sized so the filled one is exactly the Omarchy logo: the logo
+  // is the omarchy font glyph at body size, and the fill sits 1px inside.
+  readonly property real cellSize: Style.font.body + 2
   readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
 
   function focusWorkspace(id) {
@@ -107,7 +108,8 @@ BarWidget {
   onVerticalChanged: root.refresh()
 
   implicitWidth: groupGrid.implicitWidth + trailingGap
-  implicitHeight: groupGrid.implicitHeight
+  // Full bar height so the shorter groups centre on the bar (and the logo).
+  implicitHeight: root.vertical ? groupGrid.implicitHeight : Math.max(groupGrid.implicitHeight, root.barSize)
 
   GridLayout {
     id: groupGrid
@@ -129,7 +131,7 @@ BarWidget {
         implicitWidth: cells.implicitWidth + (root.bordered ? 4 : 0)
         implicitHeight: cells.implicitHeight + (root.bordered ? 4 : 0)
         color: "transparent"
-        radius: 3
+        radius: 0
         border.width: root.bordered ? 1 : 0
         border.color: modelData.focused ? Color.accent : Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.35)
 
@@ -137,8 +139,8 @@ BarWidget {
           id: cells
           anchors.centerIn: parent
           columns: root.vertical ? 1 : Math.max(1, group.modelData.workspaces.length)
-          columnSpacing: 2
-          rowSpacing: 2
+          columnSpacing: 1
+          rowSpacing: 1
 
           Repeater {
             model: group.modelData.workspaces
@@ -147,14 +149,14 @@ BarWidget {
               id: cell
               required property var modelData
 
-              implicitWidth: root.cellWidth
-              implicitHeight: root.cellHeight
+              implicitWidth: root.cellSize
+              implicitHeight: root.cellSize
 
               // Inset 1px so the filled block keeps a gap from the screen border.
               Rectangle {
                 anchors.fill: parent
                 anchors.margins: 1
-                radius: 2
+                radius: 0
                 color: cell.modelData.shown ? root.fg : "transparent"
               }
 
