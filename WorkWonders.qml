@@ -60,9 +60,15 @@ BarWidget {
   }
 
   // Special workspaces that just opened, so only that moment animates and a
-  // routine refresh (a window opening) doesn't replay the slide-in.
+  // routine refresh (a window opening) doesn't replay the slide-in. Ones that
+  // just closed stay as a "leaving" cell long enough to slide back out.
   property var openSpecials: ({})
   property var justOpened: ({})
+  // name -> { monitor, cell, since }: specials sliding out. Kept across the
+  // burst of refreshes a close triggers, so the slide-out isn't cut short.
+  property var leavingSpecials: ({})
+  readonly property int leaveMs: 200
+  property var settledGroups: []
 
   function refresh() {
     if (queryProc.running) {
@@ -97,16 +103,42 @@ BarWidget {
         })
         const open = {}
         const fresh = {}
+        const listed = {}
         groups.forEach(function(g) {
           g.workspaces.forEach(function(w) {
-            if (!w.special || !w.shown) return
-            open[w.name] = true
+            if (!w.special) return
+            listed[w.name] = true
+            if (!w.shown) return
+            open[w.name] = { monitor: g.monitor, cell: w }
             if (!root.openSpecials[w.name]) fresh[w.name] = true
           })
         })
+        // Closed since the last read and no longer listed at all: keep a
+        // leaving copy where it was until the slide-out finishes.
+        const now = Date.now()
+        const leavingNow = {}
+        for (const name in root.leavingSpecials) {
+          const l = root.leavingSpecials[name]
+          if (!open[name] && !listed[name] && now - l.since < root.leaveMs) leavingNow[name] = l
+        }
+        for (const name in root.openSpecials) {
+          if (open[name] || listed[name] || leavingNow[name]) continue
+          leavingNow[name] = Object.assign({}, root.openSpecials[name], { since: now })
+        }
+        const shown = groups.map(function(g) {
+          const cells = g.workspaces.slice()
+          for (const name in leavingNow) {
+            const l = leavingNow[name]
+            if (l.monitor === g.monitor) cells.push(Object.assign({}, l.cell, { leaving: true, leaveSince: l.since }))
+          }
+          return Object.assign({}, g, { workspaces: cells })
+        })
         root.justOpened = fresh
         root.openSpecials = open
-        root.groups = groups
+        root.leavingSpecials = leavingNow
+        root.settledGroups = groups
+        root.groups = shown
+        if (Object.keys(leavingNow).length) leaveTimer.restart()
       }
     }
   }
@@ -118,6 +150,16 @@ BarWidget {
     id: soonTimer
     interval: 50
     onTriggered: root.refresh()
+  }
+
+  // Drop leaving cells once their slide-out has played.
+  Timer {
+    id: leaveTimer
+    interval: root.leaveMs + 20
+    onTriggered: {
+      root.leavingSpecials = ({})
+      root.groups = root.settledGroups
+    }
   }
 
   Timer {
@@ -187,8 +229,12 @@ BarWidget {
               id: cell
               required property var modelData
 
-              readonly property bool slideIn: modelData.special && modelData.shown && !!root.justOpened[modelData.name]
-              property real reveal: slideIn ? 0 : 1
+              readonly property bool slideIn: modelData.special && modelData.shown && !modelData.leaving && !!root.justOpened[modelData.name]
+              readonly property bool slideOut: !!modelData.leaving
+              // A rebuild mid slide-out recreates this cell; carry on from
+              // where the old one was instead of starting over.
+              readonly property real leaveFrom: slideOut ? Math.max(0, 1 - (Date.now() - modelData.leaveSince) / root.leaveMs) : 1
+              property real reveal: slideIn ? 0 : leaveFrom
 
               implicitWidth: root.vertical ? root.cellSize : root.cellSize * reveal
               implicitHeight: root.vertical ? root.cellSize * reveal : root.cellSize
@@ -200,6 +246,14 @@ BarWidget {
                 from: 0
                 to: 1
                 duration: 180
+                easing.type: Easing.OutCubic
+              }
+
+              NumberAnimation on reveal {
+                running: cell.slideOut
+                from: cell.leaveFrom
+                to: 0
+                duration: Math.max(1, root.leaveMs * cell.leaveFrom)
                 easing.type: Easing.OutCubic
               }
 
