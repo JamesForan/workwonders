@@ -13,6 +13,7 @@ Made for multi-monitor setups, where Omarchy's own workspace widget shows one ro
 - One group per monitor. Screens side by side read left to right, as they sit; stacked screens put the laptop first, or set the order as you like.
 - The workspace each screen is showing is drawn inverted, so with two screens you see both at a glance.
 - The focused screen's group is outlined in your theme's accent colour.
+- With a bar on every screen, each bar shows all of them and marks its own screen's group with a second, inner line, like the Omarchy logo.
 - Empty workspaces are dimmed. Click any number to go there.
 - Follows your workspace rules: a workspace you've assigned to a monitor sits in that monitor's group even before it exists, so empty slots stay clickable where they will open.
 - A workspace you've moved to another screen shows under the screen it's on now.

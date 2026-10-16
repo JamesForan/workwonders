@@ -11,7 +11,9 @@ import "WorkWondersModel.js" as WorkWondersModel
 //
 // One group per monitor (see "order" below). With more than
 // one monitor each group gets a square border, and the focused monitor's border takes
-// the theme accent. The workspace each monitor is showing is drawn inverted.
+// the theme accent. The group for the screen this bar is on gets a second,
+// inner line, like the Omarchy logo, so with a bar on every screen each bar
+// shows which group is "here". The workspace each monitor is showing is drawn inverted.
 // Empty workspaces are dimmed. Click a number to go there.
 //
 // Settings (on this widget's entry in ~/.config/omarchy/shell.json):
@@ -35,9 +37,15 @@ BarWidget {
   property var groups: []
 
   readonly property var screen: QsWindow.window ? QsWindow.window.screen : null
-  readonly property string ownMonitor: screen ? String(screen.name || "") : ""
+  // The screen this bar is on (a test can set it).
+  property string ownMonitor: screen ? String(screen.name || "") : ""
   readonly property var shownGroups: WorkWondersModel.forScreen(root.groups, root.setting("screens", "all"), root.ownMonitor)
   readonly property bool bordered: shownGroups.length > 1
+
+  // True for the group of the screen this bar is on, which gets the inner line.
+  function isOwn(monitor) {
+    return root.bordered && root.ownMonitor !== "" && monitor === root.ownMonitor
+  }
 
   readonly property color fg: root.bar ? root.bar.barForeground : Color.foreground
   readonly property color inverseText: Color.background
@@ -227,15 +235,30 @@ BarWidget {
       Rectangle {
         id: group
         required property var modelData
+        readonly property bool own: root.isOwn(modelData.monitor)
 
         visible: modelData.workspaces.length > 0
         Layout.alignment: Qt.AlignVCenter
-        implicitWidth: cells.implicitWidth + (root.bordered ? 4 : 0)
-        implicitHeight: cells.implicitHeight + (root.bordered ? 4 : 0)
+        // Same size with or without the inner line, so groups don't shift
+        // between bars.
+        implicitWidth: cells.implicitWidth + (root.bordered ? 6 : 0)
+        implicitHeight: cells.implicitHeight + (root.bordered ? 6 : 0)
         color: "transparent"
         radius: 0
         border.width: root.bordered ? 1 : 0
         border.color: modelData.focused ? Color.accent : Qt.rgba(root.fg.r, root.fg.g, root.fg.b, 0.35)
+
+        // This bar's own screen: an inner line 1px inside the border.
+        Rectangle {
+          objectName: "ownFrame"
+          anchors.fill: parent
+          anchors.margins: 2
+          visible: group.own
+          color: "transparent"
+          radius: 0
+          border.width: 1
+          border.color: group.border.color
+        }
 
         GridLayout {
           id: cells

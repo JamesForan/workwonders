@@ -79,6 +79,17 @@ ShellRoot {
         return
       }
       const first = harness.expected[0]
+      // Put the bar on the first group's screen: only that group gets the
+      // inner line, and only when there is more than one group.
+      if (first) {
+        harness.widget.ownMonitor = first.monitor
+        const owns = harness.expected.map(function(g) { return harness.widget.isOwn(g.monitor) })
+        const wantOwns = harness.expected.map(function(g, i) { return harness.expected.length > 1 && i === 0 })
+        if (JSON.stringify(owns) !== JSON.stringify(wantOwns)) {
+          harness.fail("own screen\n  got:  " + JSON.stringify(owns) + "\n  want: " + JSON.stringify(wantOwns))
+          return
+        }
+      }
       const numbered = first ? first.workspaces.filter(function(w) { return !w.special }) : []
       if (numbered.length > 0) {
         harness.widget.focusWorkspace(numbered[0].id)

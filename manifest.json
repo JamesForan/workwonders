@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "jamesforan.workwonders",
   "name": "Work Wonders",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "James Foran",
   "description": "Which workspace every screen is showing, grouped by monitor in one bar",
   "kinds": [
