@@ -1,8 +1,10 @@
-# Bearings
+# Work Wonders
 
 Which workspace every screen is showing, from one bar. Workspaces are grouped by monitor, and each screen's current workspace is highlighted.
 
-![Bearings in the bar: a Samsung group showing workspace 2 and a laptop group showing workspace 1, with the focused laptop group outlined in the theme accent](preview.png)
+![Work Wonders in the bar: a Samsung group showing workspace 2 and a laptop group showing workspace 1, with the focused laptop group outlined in the theme accent](preview.png)
+
+![Laptop below a Samsung monitor: the bar's two boxes match the two screens, the Samsung showing workspace 2 and the laptop workspace 1 with a drop-down terminal open](screens.png)
 
 Made for multi-monitor setups, where Omarchy's own workspace widget shows one row of numbers and you can't tell which screen is on which workspace.
 
@@ -25,13 +27,13 @@ Made for multi-monitor setups, where Omarchy's own workspace widget shows one ro
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/JamesForan/bearings.git --enable
+omarchy plugin add https://github.com/JamesForan/workwonders.git --enable
 ```
 
 Then swap it in for the built-in workspaces widget, either by dragging widgets on the bar or in `~/.config/omarchy/shell.json`, by changing the `omarchy.workspaces` entry in `bar.layout` to:
 
 ```json
-{ "id": "jamesforan.bearings" }
+{ "id": "jamesforan.workwonders" }
 ```
 
 The shell reloads `shell.json` on save.
@@ -50,14 +52,14 @@ Add these to the widget's entry in `bar.layout`:
 For example, on a bar drawn on every screen:
 
 ```json
-{ "id": "jamesforan.bearings", "screens": "own" }
+{ "id": "jamesforan.workwonders", "screens": "own" }
 ```
 
 Or, with a scratchpad and a quake-style drop-down terminal that live in special workspaces named `scratchpad` and `terminal`:
 
 ```json
 {
-  "id": "jamesforan.bearings",
+  "id": "jamesforan.workwonders",
   "specials": "always",
   "specialLabels": { "scratchpad": "S", "terminal": "Q" }
 }
@@ -65,7 +67,7 @@ Or, with a scratchpad and a quake-style drop-down terminal that live in special 
 
 ## Assigning workspaces to monitors
 
-Bearings reads Hyprland's workspace rules, so assigned workspaces show in the right group. In `~/.config/hypr/monitors.lua`:
+Work Wonders reads Hyprland's workspace rules, so assigned workspaces show in the right group. In `~/.config/hypr/monitors.lua`:
 
 ```lua
 hl.workspace_rule({ workspace = "1", monitor = "eDP-1" })
@@ -84,7 +86,7 @@ hl.workspace_rule({ workspace = "2", monitor = "desc:Samsung Electric Company SE
 Put `omarchy.workspaces` back in `bar.layout`, then:
 
 ```bash
-omarchy plugin remove jamesforan.bearings
+omarchy plugin remove jamesforan.workwonders
 ```
 
 ## Development
@@ -92,11 +94,11 @@ omarchy plugin remove jamesforan.bearings
 The repository root is the plugin folder:
 
 - `manifest.json`: plugin manifest (a `bar-widget`).
-- `Bearings.qml`: the widget. It reads `hyprctl -j monitors`, `workspaces` and `workspacerules` after each relevant Hyprland event.
-- `BearingsModel.js`: which workspace goes in which group, and the monitor order. It has no Qt dependencies, so it runs under node.
+- `WorkWonders.qml`: the widget. It reads `hyprctl -j monitors`, `workspaces` and `workspacerules` after each relevant Hyprland event.
+- `WorkWondersModel.js`: which workspace goes in which group, and the monitor order. It has no Qt dependencies, so it runs under node.
 - `tests/`: recorded `hyprctl` output for several monitor setups and the groups each should produce. `tests/run` checks them under node and never touches your session. After an intended output change, `tests/run --update` rewrites the expected files; review the diff before committing.
 
-Validate with `omarchy plugin validate .` and `tests/run`. For local testing, copy `manifest.json`, `Bearings.qml` and `BearingsModel.js` to `~/.config/omarchy/plugins/jamesforan.bearings/`, run `omarchy-shell shell rescanPlugins` and `omarchy plugin enable jamesforan.bearings`. If an edit doesn't show up, restart the shell (`omarchy restart shell`).
+Validate with `omarchy plugin validate .` and `tests/run`. For local testing, copy `manifest.json`, `WorkWonders.qml` and `WorkWondersModel.js` to `~/.config/omarchy/plugins/jamesforan.workwonders/`, run `omarchy-shell shell rescanPlugins` and `omarchy plugin enable jamesforan.workwonders`. If an edit doesn't show up, restart the shell (`omarchy restart shell`).
 
 ## License
 

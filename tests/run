@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Runs BearingsModel.layout against recorded hyprctl output in
+// Runs WorkWondersModel.layout against recorded hyprctl output in
 // fixtures/<case>/input.json (plus options.json if present) and compares the
 // result with fixtures/<case>/expected.json.
 //
@@ -10,7 +10,7 @@
 
 const fs = require("fs")
 const path = require("path")
-const model = require("../BearingsModel.js")
+const model = require("../WorkWondersModel.js")
 
 const update = process.argv.includes("--update")
 const root = path.join(__dirname, "fixtures")

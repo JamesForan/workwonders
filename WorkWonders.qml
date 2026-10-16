@@ -5,9 +5,9 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
-import "BearingsModel.js" as BearingsModel
+import "WorkWondersModel.js" as WorkWondersModel
 
-// Bearings: which workspace every screen is showing, from one bar.
+// Work Wonders: which workspace every screen is showing, from one bar.
 //
 // One group per monitor, ordered as the monitors are laid out. With more than
 // one monitor each group gets a square border, and the focused monitor's border takes
@@ -26,13 +26,13 @@ import "BearingsModel.js" as BearingsModel
 //              {"scratchpad": "S", "terminal": "Q"}. Default: first letter.
 BarWidget {
   id: root
-  moduleName: "jamesforan.bearings"
+  moduleName: "jamesforan.workwonders"
 
   property var groups: []
 
   readonly property var screen: QsWindow.window ? QsWindow.window.screen : null
   readonly property string ownMonitor: screen ? String(screen.name || "") : ""
-  readonly property var shownGroups: BearingsModel.forScreen(root.groups, root.setting("screens", "all"), root.ownMonitor)
+  readonly property var shownGroups: WorkWondersModel.forScreen(root.groups, root.setting("screens", "all"), root.ownMonitor)
   readonly property bool bordered: shownGroups.length > 1
 
   readonly property color fg: root.bar ? root.bar.barForeground : Color.foreground
@@ -84,7 +84,7 @@ BarWidget {
         } catch (e) {
           return
         }
-        const groups = BearingsModel.layout(data, {
+        const groups = WorkWondersModel.layout(data, {
           vertical: root.vertical,
           alwaysShow: root.setting("alwaysShow", null),
           specials: root.setting("specials", "open"),

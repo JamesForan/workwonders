@@ -1,4 +1,4 @@
-// Layout logic for the Bearings bar widget, kept Qt-free so tests/run can check
+// Layout logic for the Work Wonders bar widget, kept Qt-free so tests/run can check
 // it under node against recorded hyprctl output.
 //
 // Input is what hyprctl prints: { monitors, workspaces, rules } from

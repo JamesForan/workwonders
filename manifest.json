@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "jamesforan.bearings",
-  "name": "Bearings",
+  "id": "jamesforan.workwonders",
+  "name": "Work Wonders",
   "version": "0.1.0",
   "author": "James Foran",
   "description": "Which workspace every screen is showing, grouped by monitor in one bar",
@@ -9,10 +9,10 @@
     "bar-widget"
   ],
   "entryPoints": {
-    "barWidget": "Bearings.qml"
+    "barWidget": "WorkWonders.qml"
   },
   "barWidget": {
-    "displayName": "Bearings",
+    "displayName": "Work Wonders",
     "description": "Workspaces grouped by monitor, with each screen's current workspace highlighted",
     "category": "Compositor",
     "allowMultiple": false
