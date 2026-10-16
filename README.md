@@ -2,9 +2,9 @@
 
 Which workspace every screen is showing, from one bar. Workspaces are grouped by monitor, and each screen's current workspace is highlighted.
 
-![Work Wonders in the bar: a Samsung group showing workspace 2 and a laptop group showing workspace 1, with the focused laptop group outlined in the theme accent](preview.png)
+![Work Wonders in the bar: a monitor group showing workspace 2 and a laptop group showing workspace 1, with the focused laptop group outlined in the theme accent](preview.png)
 
-![Laptop below a Samsung monitor: the bar's two boxes match the two screens, the Samsung showing workspace 2 and the laptop workspace 1 with a drop-down terminal open](screens.png)
+![Laptop below an external monitor: the bar's two boxes match the two screens, the monitor showing workspace 2 and the laptop workspace 1 with a drop-down terminal open](screens.png)
 
 Made for multi-monitor setups, where Omarchy's own workspace widget shows one row of numbers and you can't tell which screen is on which workspace.
 
@@ -72,7 +72,7 @@ Work Wonders reads Hyprland's workspace rules, so assigned workspaces show in th
 
 ```lua
 hl.workspace_rule({ workspace = "1", monitor = "eDP-1" })
-hl.workspace_rule({ workspace = "2", monitor = "desc:Samsung Electric Company SE790C" })
+hl.workspace_rule({ workspace = "2", monitor = "desc:Dell Inc. DELL U3425WE" })
 ```
 
 `desc:` matches the start of the monitor's description, as in Hyprland's own rules. `hyprctl monitors` lists both names and descriptions.

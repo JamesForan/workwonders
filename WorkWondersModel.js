@@ -90,7 +90,7 @@ function sortedMonitors(monitors, order) {
 }
 
 // A rule's monitor is an output name ("DP-1") or a description prefix
-// ("desc:Samsung Electric Company SE790C"), as in Hyprland config.
+// ("desc:Dell Inc. DELL U3425WE"), as in Hyprland config.
 function resolveMonitor(spec, monitors) {
   var text = String(spec || "")
   if (!text) return null
