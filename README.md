@@ -2,7 +2,7 @@
 
 Which workspace every screen is showing, from one bar. Workspaces are grouped by monitor, and each screen's current workspace is highlighted.
 
-![Work Wonders in the bar: a monitor group showing workspace 2 and a laptop group showing workspace 1, with the focused laptop group outlined in the theme accent](preview.png)
+![Work Wonders on two bars, one per screen: both show the laptop group (workspace 1 plus the drop-down terminal Q, focused, outlined in the theme accent) and the monitor group (workspace 2). Each bar draws a second, inner line around its own screen's group](preview.png)
 
 ![Laptop below an external monitor: the bar's two boxes match the two screens, the monitor showing workspace 2 and the laptop workspace 1 with a drop-down terminal open](screens.png)
 
