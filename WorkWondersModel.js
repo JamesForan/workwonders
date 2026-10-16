@@ -72,9 +72,14 @@ function sortedMonitors(monitors, order) {
     ordered = reading.filter(isInternal).concat(reading.filter(function(m) { return !isInternal(m) }))
   }
 
-  if (Array.isArray(order) && order.length) {
+  // Settings reach the widget through QML properties, which hand a JSON list
+  // over as an array-like sequence rather than a real Array.
+  var list = Array.isArray(order) ? order
+    : order && typeof order === "object" && typeof order.length === "number" ? Array.prototype.slice.call(order)
+    : null
+  if (list && list.length) {
     var first = []
-    order.forEach(function(spec) {
+    list.forEach(function(spec) {
       var name = resolveMonitor(spec, ordered)
       var m = ordered.filter(function(x) { return x.name === name })[0]
       if (m && first.indexOf(m) === -1) first.push(m)

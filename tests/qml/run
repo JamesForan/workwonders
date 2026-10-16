@@ -1,0 +1,79 @@
+#!/bin/bash
+# Loads WorkWonders.qml in Quickshell with the real Omarchy shell modules
+# (qs.Commons, qs.Ui from $OMARCHY_PATH/shell), once per fixture in
+# tests/fixtures, and checks that it builds the same groups tests/run expects,
+# sends correctly quoted dispatches when clicked, and logs no QML warnings.
+#
+# Headless (offscreen, no window) with a stubbed hyprctl and a scratch $HOME,
+# following Omarchy's test conventions (docs/testing.md), so it never touches
+# the running session.
+
+set -euo pipefail
+
+here=$(cd "$(dirname "$0")" && pwd)
+plugin=$(cd "$here/../.." && pwd)
+omarchy=${OMARCHY_PATH:-/usr/share/omarchy}
+command -v quickshell >/dev/null || { echo "tests/qml/run: quickshell isn't installed" >&2; exit 2; }
+[[ -d $omarchy/shell/Commons ]] || { echo "tests/qml/run: no Omarchy shell at $omarchy/shell" >&2; exit 2; }
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+# The harness stands in for the shell root, so qs.Commons and qs.Ui resolve
+# to the real Omarchy modules.
+mkdir -p "$work/shell" "$work/bin"
+cp -r "$omarchy/shell/Commons" "$omarchy/shell/Ui" "$work/shell/"
+cp "$here/shell.qml" "$work/shell/"
+
+# hyprctl answers from the fixture and records dispatches.
+cat >"$work/bin/hyprctl" <<'STUB'
+#!/bin/bash
+case "$*" in
+  "-j monitors") jq '.monitors' "$FIXTURE/input.json" ;;
+  "-j workspaces") jq '.workspaces' "$FIXTURE/input.json" ;;
+  "-j workspacerules") jq '.rules // []' "$FIXTURE/input.json" ;;
+  dispatch\ *) shift; printf '%s\n' "$*" >>"$DISPATCH_LOG" ;;
+  *) echo "hyprctl stub: unexpected '$*'" >&2; exit 1 ;;
+esac
+STUB
+chmod +x "$work/bin/hyprctl"
+
+# Scratch home with a real theme, so Color.* resolves as on a desktop.
+export HOME=$work/home
+mkdir -p "$HOME/.local/state/omarchy/current/theme"
+cp "$omarchy/themes/tokyo-night/colors.toml" "$HOME/.local/state/omarchy/current/theme/"
+unset WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE
+export QT_QPA_PLATFORM=offscreen
+
+failed=0
+for dir in "$plugin"/tests/fixtures/*/; do
+  name=$(basename "$dir")
+  log=$work/$name.log dispatches=$work/$name.dispatch
+  : >"$dispatches"
+  settings='{}'
+  [[ -f $dir/options.json ]] && settings=$(jq -c 'del(.vertical)' "$dir/options.json")
+  PATH="$work/bin:$PATH" FIXTURE=$dir DISPATCH_LOG=$dispatches \
+    PLUGIN_ENTRY="file://$plugin/WorkWonders.qml" \
+    EXPECTED_JSON="$(jq -c . "$dir/expected.json")" SETTINGS_JSON="$settings" \
+    timeout 30 quickshell -p "$work/shell/shell.qml" >"$log" 2>&1 || true
+
+  problems=()
+  grep -q 'RESULT OK' "$log" || problems+=("$(grep -A3 'RESULT FAIL' "$log" || echo 'no result (crashed or timed out)')")
+  # Any warning or error raised from the plugin's own files.
+  if grep -E "$plugin/|TypeError|ReferenceError|SyntaxError" "$log" | grep -qv 'Launching config'; then
+    problems+=("$(grep -E "$plugin/|TypeError|ReferenceError|SyntaxError" "$log" | grep -v 'Launching config')")
+  fi
+  # The clicks run as separate processes, so compare in sorted order.
+  want=$(sed -n 's/.*EXPECT-DISPATCH //p' "$log" | sort)
+  got=$(sort "$dispatches")
+  [[ $want == "$got" ]] || problems+=("dispatches"$'\n'"  got:  ${got//$'\n'/ | }"$'\n'"  want: ${want//$'\n'/ | }")
+
+  if ((${#problems[@]})); then
+    failed=1
+    echo "FAIL $name"
+    printf '  %s\n' "${problems[@]}"
+  else
+    echo "ok   $name"
+  fi
+done
+exit $failed

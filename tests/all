@@ -1,0 +1,40 @@
+#!/bin/bash
+# Every check, in one go: run before pushing (the pre-push hook does).
+# Keeps going past a failing step and reports them all at the end.
+
+set -uo pipefail
+
+plugin=$(cd "$(dirname "$0")/.." && pwd)
+omarchy=${OMARCHY_PATH:-/usr/share/omarchy}
+failed=()
+
+step() {
+  local name=$1
+  shift
+  echo "== $name"
+  "$@" || failed+=("$name")
+}
+
+text_format() {
+  # The scan reads ROOT/shell, so point a scratch ROOT at the plugin's QML.
+  local root out
+  root=$(mktemp -d)
+  mkdir "$root/shell"
+  cp "$plugin"/*.qml "$root/shell/"
+  out=$(python3 "$plugin/tests/qml-text-format-scan.py" "$root")
+  rm -rf "$root"
+  [[ -z $out ]] || { echo "$out"; return 1; }
+  echo "ok"
+}
+
+step "manifest (omarchy plugin validate)" "$omarchy/bin/omarchy-plugin-validate" "$plugin"
+step "model fixtures" "$plugin/tests/run"
+step "Text elements set textFormat" text_format
+step "loads in the Omarchy shell" "$plugin/tests/qml/run"
+
+echo
+if ((${#failed[@]})); then
+  printf 'FAILED: %s\n' "${failed[@]}"
+  exit 1
+fi
+echo "All checks passed."

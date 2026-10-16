@@ -99,7 +99,9 @@ The repository root is the plugin folder:
 - `WorkWondersModel.js`: which workspace goes in which group, and the monitor order. It has no Qt dependencies, so it runs under node.
 - `tests/`: recorded `hyprctl` output for several monitor setups and the groups each should produce. `tests/run` checks them under node and never touches your session. After an intended output change, `tests/run --update` rewrites the expected files; review the diff before committing.
 
-Validate with `omarchy plugin validate .` and `tests/run`. For local testing, copy `manifest.json`, `WorkWonders.qml` and `WorkWondersModel.js` to `~/.config/omarchy/plugins/jamesforan.workwonders/`, run `omarchy-shell shell rescanPlugins` and `omarchy plugin enable jamesforan.workwonders`. If an edit doesn't show up, restart the shell (`omarchy restart shell`).
+`tests/qml/run` loads the widget headlessly in Quickshell with the real Omarchy shell modules for each of those setups, and checks its groups and click commands.
+
+`tests/all` runs every check: `omarchy plugin validate`, the fixtures, Omarchy's `textFormat` scan for `Text` elements (vendored from Omarchy's own tests), and the QML load. Install it as a pre-push hook with `ln -s ../../tests/all .git/hooks/pre-push`. For local testing, copy `manifest.json`, `WorkWonders.qml` and `WorkWondersModel.js` to `~/.config/omarchy/plugins/jamesforan.workwonders/`, run `omarchy-shell shell rescanPlugins` and `omarchy plugin enable jamesforan.workwonders`. If an edit doesn't show up, restart the shell (`omarchy restart shell`).
 
 ## License
 

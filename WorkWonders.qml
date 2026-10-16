@@ -294,6 +294,7 @@ BarWidget {
               Text {
                 anchors.centerIn: parent
                 text: cell.modelData.label
+                textFormat: Text.PlainText
                 color: cell.modelData.shown ? root.inverseText : root.fg
                 opacity: cell.modelData.shown || cell.modelData.occupied ? 1 : 0.5
                 font.family: root.fontFamily
