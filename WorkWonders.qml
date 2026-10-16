@@ -68,6 +68,9 @@ BarWidget {
   // burst of refreshes a close triggers, so the slide-out isn't cut short.
   property var leavingSpecials: ({})
   readonly property int leaveMs: 200
+  // name -> since: specials sliding in, kept across refreshes like the above.
+  property var openingSpecials: ({})
+  readonly property int enterMs: 180
   property var settledGroups: []
 
   function refresh() {
@@ -110,12 +113,22 @@ BarWidget {
             listed[w.name] = true
             if (!w.shown) return
             open[w.name] = { monitor: g.monitor, cell: w }
-            if (!root.openSpecials[w.name]) fresh[w.name] = true
           })
         })
+        const now = Date.now()
+        // Which monitors had a special open before this read.
+        const hadOpen = {}
+        for (const name in root.openSpecials) hadOpen[root.openSpecials[name].monitor] = name
+        const hasOpen = {}
+        for (const name in open) hasOpen[open[name].monitor] = name
+        // Slide in only onto a screen that had no special open; one special
+        // replacing another on the same screen just takes its place.
+        for (const name in open) {
+          if (root.openingSpecials[name] !== undefined && now - root.openingSpecials[name] < root.enterMs) fresh[name] = root.openingSpecials[name]
+          else if (!root.openSpecials[name] && !hadOpen[open[name].monitor]) fresh[name] = now
+        }
         // Closed since the last read and no longer listed at all: keep a
         // leaving copy where it was until the slide-out finishes.
-        const now = Date.now()
         const leavingNow = {}
         for (const name in root.leavingSpecials) {
           const l = root.leavingSpecials[name]
@@ -123,6 +136,8 @@ BarWidget {
         }
         for (const name in root.openSpecials) {
           if (open[name] || listed[name] || leavingNow[name]) continue
+          // Replaced by another special on the same screen: no slide-out.
+          if (hasOpen[root.openSpecials[name].monitor]) continue
           leavingNow[name] = Object.assign({}, root.openSpecials[name], { since: now })
         }
         const shown = groups.map(function(g) {
@@ -134,6 +149,7 @@ BarWidget {
           return Object.assign({}, g, { workspaces: cells })
         })
         root.justOpened = fresh
+        root.openingSpecials = fresh
         root.openSpecials = open
         root.leavingSpecials = leavingNow
         root.settledGroups = groups
@@ -229,12 +245,13 @@ BarWidget {
               id: cell
               required property var modelData
 
-              readonly property bool slideIn: modelData.special && modelData.shown && !modelData.leaving && !!root.justOpened[modelData.name]
+              readonly property bool slideIn: modelData.special && modelData.shown && !modelData.leaving && root.justOpened[modelData.name] !== undefined
               readonly property bool slideOut: !!modelData.leaving
-              // A rebuild mid slide-out recreates this cell; carry on from
-              // where the old one was instead of starting over.
+              // A rebuild mid slide recreates this cell; carry on from where
+              // the old one was instead of starting over.
+              readonly property real enterFrom: slideIn ? Math.min(1, (Date.now() - root.justOpened[modelData.name]) / root.enterMs) : 1
               readonly property real leaveFrom: slideOut ? Math.max(0, 1 - (Date.now() - modelData.leaveSince) / root.leaveMs) : 1
-              property real reveal: slideIn ? 0 : leaveFrom
+              property real reveal: slideIn ? enterFrom : leaveFrom
 
               implicitWidth: root.vertical ? root.cellSize : root.cellSize * reveal
               implicitHeight: root.vertical ? root.cellSize * reveal : root.cellSize
@@ -242,10 +259,10 @@ BarWidget {
               opacity: reveal
 
               NumberAnimation on reveal {
-                running: cell.slideIn
-                from: 0
+                running: cell.slideIn && cell.enterFrom < 1
+                from: cell.enterFrom
                 to: 1
-                duration: 180
+                duration: Math.max(1, root.enterMs * (1 - cell.enterFrom))
                 easing.type: Easing.OutCubic
               }
 
